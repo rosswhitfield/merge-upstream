@@ -1,0 +1,31 @@
+name: merge-upstream
+
+on:
+  push:
+  schedule:
+    - cron: "0 * * * *"
+
+jobs:
+  merge-upstream:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        include:
+          - owner: rosswhitfield
+            repo: mantid
+            branch: main
+          - owner: rosswhitfield
+            repo: mantid
+            branch: ornl-next
+          - owner: rosswhitfield
+            repo: IPS-framework
+            branch: main
+
+    steps:
+    - name: Merge upstream ${{ matrix.owner }}/${{ matrix.repo }} for branch ${{ matrix.branch }}
+      run: |
+        curl -X POST -H "Accept: application/vnd.github.v3+json" \
+        -H "Authorization: token ${{ secrets.TOKEN }}" \
+        https://api.github.com/repos/${{ matrix.owner }}/${{ matrix.repo }}/merge-upstream \
+        -d '{"branch":"${{ matrix.branch }}"}'
